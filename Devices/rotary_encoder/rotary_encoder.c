@@ -116,62 +116,37 @@ ROTARY_ENCODER_Status_t rotary_encoder_set_count_zero(ROTARY_ENCODER_t *encoder)
 	return ROTARY_ENCODER_OK;
 }
 
-//uint16_t rotary_encoder_get_raw_count(ROTARY_ENCODER_t *encoder)
-//{
-//	return (uint16_t) encoder->raw_count;
-//}
-//
-//uint16_t rotary_encoder_get_previous_raw_count(ROTARY_ENCODER_t *encoder)
-//{
-//	return (uint16_t)encoder->previous_raw_count;
-//}
-//
-//int16_t rotary_encoder_get_delta_count(ROTARY_ENCODER_t *encoder)
-//{
-//	return (uint16_t)encoder->delta_count;
-//}
-//
-//int32_t rotary_encoder_get_previous_total_count(ROTARY_ENCODER_t *encoder)
-//{
-//	return (uint32_t)encoder->total_count;
-//}
-//
-//float rotary_encoder_get_revolutions(ROTARY_ENCODER_t *encoder)
-//{
-//	return (float)encoder->revolutions;
-//}
-//
-//float rotary_encoder_get_angle_degrees(ROTARY_ENCODER_t *encoder)
-//{
-//	return (float)encoder->angle_degrees;
-//}
-//
-//float rotary_encoder_get_angle_radians(ROTARY_ENCODER_t *encoder)
-//{
-//	return (float)encoder->angle_radians;
-//}
-//
-//float rotary_encoder_get_counts_per_second(ROTARY_ENCODER_t *encoder)
-//{
-//	return (float)encoder->counts_per_second;
-//}
-//
-//float rotary_encoder_get_revolutions_per_second(ROTARY_ENCODER_t *encoder)
-//{
-//	return (float)encoder->revolutions_per_second;
-//}
-//
-//float rotary_encoder_get_rpm(ROTARY_ENCODER_t *encoder)
-//{
-//	return (float)encoder->rpm;
-//}
-//
-//float rotary_encoder_get_degrees_per_second(ROTARY_ENCODER_t *encoder)
-//{
-//	return (float)encoder->degrees_per_second;
-//}
-//
-//float rotary_encoder_get_radians_per_second(ROTARY_ENCODER_t *encoder)
-//{
-//	return (float)encoder->radians_per_second;
-//}
+TIM_ENCODER_Direction_t rotary_encoder_get_direction(ROTARY_ENCODER_t *encoder)
+{
+	return encoder->direction;
+}
+
+int32_t rotary_encoder_get_total_count(ROTARY_ENCODER_t *encoder)
+{
+	return (int32_t)encoder->total_count;
+}
+
+float rotary_encoder_get_revolutions(ROTARY_ENCODER_t *encoder)
+{
+	return (float)encoder->revolutions;
+}
+
+float rotary_encoder_get_cumulative_angle_degrees(ROTARY_ENCODER_t *encoder)
+{
+	return (float)encoder->cumulative_angle_degrees;
+}
+
+float rotary_encoder_get_normalized_angle_degrees(ROTARY_ENCODER_t *encoder)
+{
+	return (float)encoder->normalized_angle_degrees;
+}
+
+float rotary_encoder_get_displacement_mm(ROTARY_ENCODER_t *encoder)
+{
+	return (float)encoder->displacement_mm;
+}
+
+float rotary_encoder_get_total_distance_mm(ROTARY_ENCODER_t *encoder)
+{
+	return (float)encoder->total_distance_mm;
+}

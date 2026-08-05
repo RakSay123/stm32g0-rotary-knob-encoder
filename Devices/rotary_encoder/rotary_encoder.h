@@ -40,3 +40,17 @@ ROTARY_ENCODER_Status_t rotary_encoder_set_count(ROTARY_ENCODER_t *encoder, uint
 ROTARY_ENCODER_Status_t rotary_encoder_set_count_median(ROTARY_ENCODER_t *encoder);
 
 ROTARY_ENCODER_Status_t rotary_encoder_set_count_zero(ROTARY_ENCODER_t *encoder);
+
+TIM_ENCODER_Direction_t rotary_encoder_get_direction(ROTARY_ENCODER_t *encoder);
+
+int32_t rotary_encoder_get_total_count(ROTARY_ENCODER_t *encoder);
+
+float rotary_encoder_get_revolutions(ROTARY_ENCODER_t *encoder);
+
+float rotary_encoder_get_cumulative_angle_degrees(ROTARY_ENCODER_t *encoder);
+
+float rotary_encoder_get_normalized_angle_degrees(ROTARY_ENCODER_t *encoder);
+
+float rotary_encoder_get_displacement_mm(ROTARY_ENCODER_t *encoder);
+
+float rotary_encoder_get_total_distance_mm(ROTARY_ENCODER_t *encoder);
