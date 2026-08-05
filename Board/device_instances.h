@@ -8,5 +8,8 @@
 #pragma once
 
 #include "led/led.h"
+#include "rotary_encoder/rotary_encoder.h"
 
 LED_t* board_get_status_led(void);
+
+ROTARY_ENCODER_t* board_get_rotary_encoder(void);

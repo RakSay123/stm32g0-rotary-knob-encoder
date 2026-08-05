@@ -1,149 +1,86 @@
-# STM32G0 Bare-Metal Project Template
+# STM32G070 Bare-Metal Timer Encoder Driver
 
-## Overview
+[demo gif when finished]
 
-This repository provides a reusable starting point for bare-metal STM32 firmware development using CMSIS and STM32CubeIDE.
+### Overview
+This project implements a bare-metal quadrature encoder driver for the STM32G070 using only the CMSIS device headers. No HAL or LL libraries are used.
 
-The goal is to separate hardware-specific initialization from application logic while encouraging reusable peripheral and device drivers.
+The driver configures an STM32 timer in hardware encoder mode, allowing the timer peripheral to decode quadrature signals directly from a rotary encoder.
 
-The template currently targets the STM32G070 Nucleo board but can be adapted for other STM32 devices.
-
+The timer automatically:
+- tracks encoder position
+- detects rotation direction
+- increments/decrements the counter
+- filters noisy inputs
+- operates entirely in hardware with essentially zero CPU overhead
+---
+### Features
+- CMSIS register-level implementation
+- Hardware quadrature decoding
+- Channel configuration
+- Input capture configuration
+- Configurable digital filters
+- Configurable input prescalers
+- Configurable polarity
+- Encoder modes
+   - TI1
+   - TI2
+   - TI1 + TI2
+- Position counter API
+- Direction API
+- Rotary encoder abstraction layer
 ---
 
-## Architecture
-```
-Core/
-    Firmware entry point
-
-App/
-    Application logic
-
-Board/
-    Hardware configuration
-    Hardware initialization
-    Device instances
-
-Drivers/
-    Peripheral drivers
-
-Devices/
-    Device drivers
-```
-
-Dependency direction:
+### Driver Architecture
 ```
 Application
-        │
-        ▼
-Device Drivers
-        │
-        ▼
-Peripheral Drivers
-        │
-        ▼
-STM32 Registers
+     │
+     ▼
+rotary_encoder.c
+     │
+     ▼
+timer_encoder.c
+     │
+     ▼
+TIM3 Hardware Encoder Mode
+     │
+     ▼
+Rotary Encoder
 ```
 ---
 
-## Folder Layout
+### Hardware Used
+- STM32G070 Nucleo
+- Mechanical rotary knob encoder
+- UART debugging
+---
+
+### What I learned
+While implementing this driver I learned:
+- How quadrature encoders generate A/B waveforms
+- How timer input capture channels become encoder inputs
+- How the timer determines rotation direction
+- How encoder modes affect counting
+- How input filters remove noise
+- How alternate-function routing affects peripheral operation
+- How hardware peripherals can eliminate software processing
+---
+
+### Example Output
 ```
-Core/
-    main.c
-    syscalls.c
-    sysmem.c
+[ROTARY_ENCODER] Count: 2145
+[ROTARY_ENCODER] Direction: UP
 
-App/
-    app.c
-    app.h
-
-Board/
-    board_config.h
-    board_init.c
-    board_init.h
-    device_instances.c
-    device_instances.h
-
-Drivers/
-    gpio/
-    uart/
-    timer/
-    systick/
-    ...
-
-Devices/
-    led/
-    servo/
-    pulse_width_sensor/
-    ...
+[ROTARY_ENCODER] Count: 2202
+[ROTARY_ENCODER] Direction: DOWN
 ```
 ---
 
-## Firmware Flow
-
-```
-main()
-
-↓
-
-board_init()
-
-↓
-
-app_init()
-
-↓
-
-while (1)
-{
-    app_update();
-}
-```
----
-## Design Philosophy
-This project follows a layered architecture intended to minimize coupling between application code and hardware implementation.
-
-Peripheral drivers directly configure STM32 peripherals.
-
-Device drivers combine peripherals into reusable hardware abstractions.
-
-The board layer describes the physical hardware present on the PCB.
-
-The application layer contains only firmware behavior.
-
-This separation allows new projects to reuse the same drivers while keeping application logic clean and portable.
-
----
-
-## Current Features
-### Peripheral Drivers:
-- GPIO Driver
-- UART Driver
-- General Timer Driver
-- PWM Driver
-- Input Capture Driver
-- Encoder Driver (in development)
-- SysTick Driver
-
-### Device Drivers:
-- LED Device Driver
-- Servo Device Driver
-- BNO055 Device Driver
-- Pulse Width Sensor Device Driver
-- PWM Monitor Device Driver
-
----
-
-## Planned Features
-- ADC
-- SPI
-- DMA / DMAMUX
-- Advanced Timers
-- Motor Driver
-- Quadrature Encoder Support
-- Micromouse Platform
-
----
-
-## Version
-**Template Version 1.0**
-
+### Future Work
+- Angular position
+- Rotational velocity
+- RPM calculation
+- Degrees/sec
+- Radians/sec
+- Integration with DC motors
+- Closed-loop PID motor control
