@@ -38,8 +38,25 @@ static TIM_ENCODER_Config_t tim3_encoder_cfg = {
 
 static ROTARY_ENCODER_t rotary_encoder_cfg = {
 	.encoder_cfg = &tim3_encoder_cfg,
-	.count = 0U,
-	.direction = TIM_ENCODER_DIRECTION_UP
+
+	.radius_mm = 3.0f,
+
+	.pulses_per_revolution = 24U,
+	.counts_per_revolution = 96U,
+
+	.raw_count = 0U,
+	.previous_raw_count = 0U,
+	.delta_count = 0U,
+	.total_count = 0U,
+
+	.revolutions = 0U,
+	.cumulative_angle_degrees = 0U,
+	.normalized_angle_degrees = 0U,
+
+	.displacement_mm = 0U,
+	.total_distance_mm = 0U,
+
+	.direction = TIM_ENCODER_DIRECTION_UP,
 };
 
 

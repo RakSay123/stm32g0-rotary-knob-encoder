@@ -13,6 +13,6 @@
 
 #define BOARD_TIM3_PSC				  1 - 1
 #define BOARD_TIM3_ARR                0xFFFFU
-#define BOARD_TIM3_CNT                BOARD_TIM3_ARR / 2
+#define BOARD_TIM3_CNT                0
 
 #define BOARD_DEBUG_UART_BAUD 		  115200
