@@ -34,6 +34,9 @@ typedef struct {
 	float displacement_mm;
 	float total_distance_mm;
 
+	int32_t previous_velocity_count;
+	int32_t velocity_delta_count;
+
 	uint32_t previous_update_ms;
 	uint32_t sample_period_ms;
 
@@ -50,7 +53,9 @@ typedef struct {
 
 ROTARY_ENCODER_Status_t rotary_encoder_init(ROTARY_ENCODER_t *cfg);
 
-ROTARY_ENCODER_Status_t rotary_encoder_update(ROTARY_ENCODER_t *encoder, uint32_t now_ms);
+ROTARY_ENCODER_Status_t rotary_encoder_update_distance(ROTARY_ENCODER_t *encoder);
+
+ROTARY_ENCODER_Status_t rotary_encoder_update_velocity(ROTARY_ENCODER_t *encoder, uint32_t now_ms);
 
 ROTARY_ENCODER_Status_t rotary_encoder_set_count(ROTARY_ENCODER_t *encoder, uint32_t cnt);
 

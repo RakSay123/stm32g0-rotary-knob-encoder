@@ -83,12 +83,12 @@ static void app_print_encoder_velocity(USART_TypeDef *USARTx, ROTARY_ENCODER_t *
 
 	uart_write_str(USARTx, "Top speed: ");
 	uart_write_float(USARTx, rotary_encoder_get_top_speed_mm_per_second(rotary_encoder));
-	uart_write_line(USARTx, "mm/s");
+	uart_write_str(USARTx, " mm/s | ");
 
-//	uart_write_str(USARTx, "Motion: ");
-//	if (rotary_encoder->motion == ROTARY_ENCODER_UP) uart_write_line(USARTx, "UP");
-//	else if (rotary_encoder->motion == ROTARY_ENCODER_DOWN) uart_write_line(USARTx, "DOWN");
-//	else uart_write_line(USARTx, "STOPPED");
+	uart_write_str(USARTx, "Motion: ");
+	if (rotary_encoder->motion == ROTARY_ENCODER_UP) uart_write_line(USARTx, "UP");
+	else if (rotary_encoder->motion == ROTARY_ENCODER_DOWN) uart_write_line(USARTx, "DOWN");
+	else uart_write_line(USARTx, "STOPPED");
 }
 
 static void app_print_encoder_all(USART_TypeDef *USARTx, ROTARY_ENCODER_t *rotary_encoder)
@@ -116,6 +116,7 @@ void app_init(void)
 void app_update(void)
 {
 	uint32_t current_ms = millis();
+	rotary_encoder_update_distance(rotary_encoder);
 
 	if (current_ms - previous_toggle_ms >= APP_STATUS_LED_PERIOD_MS)
 	{
@@ -126,7 +127,7 @@ void app_update(void)
 	if (current_ms - previous_update_ms >= APP_ROTARY_ENCODER_UPDATE_PERIOD_MS)
 	{
 		previous_update_ms = current_ms;
-		rotary_encoder_update_success = rotary_encoder_update(rotary_encoder, current_ms) == ROTARY_ENCODER_OK;
+		rotary_encoder_update_success = rotary_encoder_update_velocity(rotary_encoder, current_ms) == ROTARY_ENCODER_OK;
 	}
 
 	if (current_ms - previous_print_ms >= APP_ROTARY_ENCODER_PRINT_PERIOD_MS)

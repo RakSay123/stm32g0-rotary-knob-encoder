@@ -44,6 +44,9 @@ ROTARY_ENCODER_Status_t rotary_encoder_init(ROTARY_ENCODER_t *cfg)
 	cfg->displacement_mm = 0.0f;
 	cfg->total_distance_mm = 0.0f;
 
+	cfg->previous_velocity_count = 0U;
+	cfg->velocity_delta_count = 0U;
+
 	cfg->previous_raw_count = 0U;
 	cfg->previous_update_ms = 0U;
 
@@ -52,13 +55,16 @@ ROTARY_ENCODER_Status_t rotary_encoder_init(ROTARY_ENCODER_t *cfg)
 	cfg->degrees_per_second = 0U;
 	cfg->radians_per_second = 0U;
 	cfg->linear_velocity_mm_per_second = 0U;
+	cfg->top_speed_mm_per_second = 0U;
+
+	cfg->motion = ROTARY_ENCODER_STOPPED;
 
 	cfg->counts_per_revolution = cfg->pulses_per_revolution * rotary_encoder_get_decode_multiplier(cfg->encoder_cfg);
 
 	return ROTARY_ENCODER_OK;
 }
 
-ROTARY_ENCODER_Status_t rotary_encoder_update(ROTARY_ENCODER_t *encoder, uint32_t now_ms)
+ROTARY_ENCODER_Status_t rotary_encoder_update_distance(ROTARY_ENCODER_t *encoder)
 {
 	if (encoder == NULL || encoder->encoder_cfg == NULL || encoder->counts_per_revolution == 0U) return ROTARY_ENCODER_ERR;
 
@@ -89,12 +95,29 @@ ROTARY_ENCODER_Status_t rotary_encoder_update(ROTARY_ENCODER_t *encoder, uint32_
 	if (delta_distance_mm < 0.0f) delta_distance_mm = -delta_distance_mm;
 	encoder->total_distance_mm += delta_distance_mm;
 
+	return ROTARY_ENCODER_OK;
+}
+
+static void rotary_encoder_update_motion(ROTARY_ENCODER_t *encoder)
+{
+	if (encoder->velocity_delta_count > 0) encoder->motion = ROTARY_ENCODER_UP;
+	else if (encoder->velocity_delta_count < 0) encoder->motion = ROTARY_ENCODER_DOWN;
+	else encoder->motion = ROTARY_ENCODER_STOPPED;
+}
+
+ROTARY_ENCODER_Status_t rotary_encoder_update_velocity(ROTARY_ENCODER_t *encoder, uint32_t now_ms)
+{
+	if (encoder == NULL || encoder->encoder_cfg == NULL || encoder->counts_per_revolution == 0U) return ROTARY_ENCODER_ERR;
+
 	encoder->sample_period_ms = now_ms - encoder->previous_update_ms;
 	encoder->previous_update_ms = now_ms;
 
 	if (encoder->sample_period_ms == 0U	) return ROTARY_ENCODER_OK;
 
+	encoder->velocity_delta_count = encoder->total_count - encoder->previous_velocity_count;
+
 	float elapsed_seconds = (float)encoder->sample_period_ms / 1000.0f;
+	float delta_revolutions = (float)encoder->velocity_delta_count / (float)encoder->counts_per_revolution;
 	encoder->revolutions_per_second = delta_revolutions / elapsed_seconds;
 
 	encoder->rpm = encoder->revolutions_per_second * 60.0f;
@@ -104,6 +127,10 @@ ROTARY_ENCODER_Status_t rotary_encoder_update(ROTARY_ENCODER_t *encoder, uint32_
 
 	float current_speed = (encoder->linear_velocity_mm_per_second > 0) ? encoder->linear_velocity_mm_per_second: -encoder->linear_velocity_mm_per_second;
 	if (current_speed > encoder->top_speed_mm_per_second) encoder->top_speed_mm_per_second = current_speed;
+
+	rotary_encoder_update_motion(encoder);
+
+	encoder->previous_velocity_count = encoder->total_count;
 
 	return ROTARY_ENCODER_OK;
 }
@@ -160,6 +187,7 @@ TIM_ENCODER_Direction_t rotary_encoder_get_direction(ROTARY_ENCODER_t *encoder)
 
 ROTARY_ENCODER_Motion_t rotary_encoder_get_motion(ROTARY_ENCODER_t *encoder)
 {
+	if (encoder == NULL) return ROTARY_ENCODER_STOPPED;
 	return encoder->motion;
 }
 
