@@ -8,6 +8,12 @@ typedef enum {
 	ROTARY_ENCODER_ERR
 } ROTARY_ENCODER_Status_t;
 
+typedef enum {
+	ROTARY_ENCODER_STOPPED,
+	ROTARY_ENCODER_UP,
+	ROTARY_ENCODER_DOWN,
+} ROTARY_ENCODER_Motion_t;
+
 typedef struct {
 	TIM_ENCODER_Config_t *encoder_cfg;
 
@@ -28,12 +34,23 @@ typedef struct {
 	float displacement_mm;
 	float total_distance_mm;
 
+	uint32_t previous_update_ms;
+	uint32_t sample_period_ms;
+
+	float revolutions_per_second;
+	float rpm;
+	float degrees_per_second;
+	float radians_per_second;
+	float linear_velocity_mm_per_second;
+	float top_speed_mm_per_second;
+
 	TIM_ENCODER_Direction_t direction;
+	ROTARY_ENCODER_Motion_t motion;
 } ROTARY_ENCODER_t;
 
 ROTARY_ENCODER_Status_t rotary_encoder_init(ROTARY_ENCODER_t *cfg);
 
-ROTARY_ENCODER_Status_t rotary_encoder_update(ROTARY_ENCODER_t *encoder);
+ROTARY_ENCODER_Status_t rotary_encoder_update(ROTARY_ENCODER_t *encoder, uint32_t now_ms);
 
 ROTARY_ENCODER_Status_t rotary_encoder_set_count(ROTARY_ENCODER_t *encoder, uint32_t cnt);
 
@@ -42,6 +59,8 @@ ROTARY_ENCODER_Status_t rotary_encoder_set_count_median(ROTARY_ENCODER_t *encode
 ROTARY_ENCODER_Status_t rotary_encoder_set_count_zero(ROTARY_ENCODER_t *encoder);
 
 TIM_ENCODER_Direction_t rotary_encoder_get_direction(ROTARY_ENCODER_t *encoder);
+
+ROTARY_ENCODER_Motion_t rotary_encoder_get_motion(ROTARY_ENCODER_t *encoder);
 
 int32_t rotary_encoder_get_total_count(ROTARY_ENCODER_t *encoder);
 
@@ -54,3 +73,15 @@ float rotary_encoder_get_normalized_angle_degrees(ROTARY_ENCODER_t *encoder);
 float rotary_encoder_get_displacement_mm(ROTARY_ENCODER_t *encoder);
 
 float rotary_encoder_get_total_distance_mm(ROTARY_ENCODER_t *encoder);
+
+float rotary_encoder_get_revolutions_per_second(ROTARY_ENCODER_t *encoder);
+
+float rotary_encoder_get_rpm(ROTARY_ENCODER_t *encoder);
+
+float rotary_encoder_get_degrees_per_second(ROTARY_ENCODER_t *encoder);
+
+float rotary_encoder_get_radians_per_second(ROTARY_ENCODER_t *encoder);
+
+float rotary_encoder_get_linear_velocity_mm_per_second(ROTARY_ENCODER_t *encoder);
+
+float rotary_encoder_get_top_speed_mm_per_second(ROTARY_ENCODER_t *encoder);

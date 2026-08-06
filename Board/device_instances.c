@@ -56,6 +56,15 @@ static ROTARY_ENCODER_t rotary_encoder_cfg = {
 	.displacement_mm = 0U,
 	.total_distance_mm = 0U,
 
+	.previous_update_ms = 0U,
+	.sample_period_ms = 0U,
+
+	.revolutions_per_second = 0U,
+	.rpm = 0U,
+	.degrees_per_second = 0U,
+	.radians_per_second = 0U,
+	.linear_velocity_mm_per_second = 0U,
+
 	.direction = TIM_ENCODER_DIRECTION_UP,
 };
 
