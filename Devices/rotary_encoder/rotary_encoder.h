@@ -49,6 +49,9 @@ typedef struct {
 
 	TIM_ENCODER_Direction_t direction;
 	ROTARY_ENCODER_Motion_t motion;
+
+	uint8_t consecutive_zero_samples;
+	uint8_t stopped_sample_threshold;
 } ROTARY_ENCODER_t;
 
 ROTARY_ENCODER_Status_t rotary_encoder_init(ROTARY_ENCODER_t *cfg);

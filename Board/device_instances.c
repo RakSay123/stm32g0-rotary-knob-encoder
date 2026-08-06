@@ -66,6 +66,10 @@ static ROTARY_ENCODER_t rotary_encoder_cfg = {
 	.linear_velocity_mm_per_second = 0U,
 
 	.direction = TIM_ENCODER_DIRECTION_UP,
+	.motion = ROTARY_ENCODER_STOPPED,
+
+	.consecutive_zero_samples = 0U,
+	.stopped_sample_threshold = 5U,
 };
 
 

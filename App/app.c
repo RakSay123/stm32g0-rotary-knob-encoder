@@ -25,6 +25,8 @@ static uint32_t previous_print_ms;
 
 static bool rotary_encoder_update_success;
 
+static uint8_t stop_snapshots_printed;
+
 static void app_print_encoder_position(USART_TypeDef *USARTx, ROTARY_ENCODER_t *rotary_encoder)
 {
 	uart_write_str(USARTx, "[ROTARY_ENCODER] Direction: ");
@@ -88,7 +90,8 @@ static void app_print_encoder_velocity(USART_TypeDef *USARTx, ROTARY_ENCODER_t *
 	uart_write_str(USARTx, "Motion: ");
 	if (rotary_encoder->motion == ROTARY_ENCODER_UP) uart_write_line(USARTx, "UP");
 	else if (rotary_encoder->motion == ROTARY_ENCODER_DOWN) uart_write_line(USARTx, "DOWN");
-	else uart_write_line(USARTx, "STOPPED");
+	else if (rotary_encoder->motion == ROTARY_ENCODER_STOPPED) uart_write_line(USARTx, "STOPPED");
+	else uart_write_line(USARTx, "UNKNOWN");
 }
 
 static void app_print_encoder_all(USART_TypeDef *USARTx, ROTARY_ENCODER_t *rotary_encoder)
@@ -96,6 +99,24 @@ static void app_print_encoder_all(USART_TypeDef *USARTx, ROTARY_ENCODER_t *rotar
 	app_print_encoder_position(USARTx, rotary_encoder);
 	app_print_encoder_distance(USARTx, rotary_encoder);
 	app_print_encoder_velocity(USARTx, rotary_encoder);
+}
+
+static void app_handle_encoder_print(USART_TypeDef *USARTx, ROTARY_ENCODER_t *encoder)
+{
+	ROTARY_ENCODER_Motion_t motion = rotary_encoder_get_motion(encoder);
+
+	if (motion == ROTARY_ENCODER_STOPPED)
+	{
+		if (stop_snapshots_printed >= APP_STOPPED_SNAPSHOT_LIMIT) return;
+		stop_snapshots_printed++;
+	}
+	else
+	{
+		stop_snapshots_printed = 0U;
+	}
+
+	app_print_encoder_all(USARTx, encoder);
+	uart_write_line(USARTx, "");
 }
 
 void app_init(void)
@@ -111,6 +132,8 @@ void app_init(void)
 	previous_toggle_ms = millis();
 	previous_update_ms = millis();
 	previous_print_ms = millis();
+
+	stop_snapshots_printed = 0;
 }
 
 void app_update(void)
@@ -134,15 +157,7 @@ void app_update(void)
 	{
 		previous_print_ms = current_ms;
 
-		if (rotary_encoder_update_success)
-		{
-			app_print_encoder_all(USART2, rotary_encoder);
-		}
-		else
-		{
-			uart_write_line(USART2, "[ROTARY_ENCODER] Update failed");
-		}
-
-		uart_write_line(USART2, "");
+		if (rotary_encoder_update_success) app_handle_encoder_print(USART2, rotary_encoder);
+		else uart_write_line(USART2, "[ROTARY_ENCODER] Update failed");
 	}
 }

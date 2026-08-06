@@ -32,6 +32,8 @@ ROTARY_ENCODER_Status_t rotary_encoder_init(ROTARY_ENCODER_t *cfg)
 
 	if (timer_encoder_get_direction(cfg->encoder_cfg, &cfg->direction) != TIM_OK) return ROTARY_ENCODER_ERR;
 
+	cfg->counts_per_revolution = cfg->pulses_per_revolution * rotary_encoder_get_decode_multiplier(cfg->encoder_cfg);
+
 	cfg->raw_count = (uint16_t)initial_count;
 	cfg->previous_raw_count = cfg->raw_count;
 	cfg->delta_count = 0;
@@ -59,7 +61,7 @@ ROTARY_ENCODER_Status_t rotary_encoder_init(ROTARY_ENCODER_t *cfg)
 
 	cfg->motion = ROTARY_ENCODER_STOPPED;
 
-	cfg->counts_per_revolution = cfg->pulses_per_revolution * rotary_encoder_get_decode_multiplier(cfg->encoder_cfg);
+	cfg->consecutive_zero_samples = 0U;
 
 	return ROTARY_ENCODER_OK;
 }
@@ -100,9 +102,21 @@ ROTARY_ENCODER_Status_t rotary_encoder_update_distance(ROTARY_ENCODER_t *encoder
 
 static void rotary_encoder_update_motion(ROTARY_ENCODER_t *encoder)
 {
-	if (encoder->velocity_delta_count > 0) encoder->motion = ROTARY_ENCODER_UP;
-	else if (encoder->velocity_delta_count < 0) encoder->motion = ROTARY_ENCODER_DOWN;
-	else encoder->motion = ROTARY_ENCODER_STOPPED;
+	if (encoder->velocity_delta_count > 0)
+	{
+		encoder->motion = ROTARY_ENCODER_UP;
+		encoder->consecutive_zero_samples = 0U;
+	}
+	else if (encoder->velocity_delta_count < 0)
+	{
+		encoder->motion = ROTARY_ENCODER_DOWN;
+		encoder->consecutive_zero_samples = 0U;
+	}
+	else
+	{
+		if (encoder->consecutive_zero_samples < encoder->stopped_sample_threshold) encoder->consecutive_zero_samples++;
+		if (encoder->consecutive_zero_samples >= encoder->stopped_sample_threshold) encoder->motion = ROTARY_ENCODER_STOPPED;
+	}
 }
 
 ROTARY_ENCODER_Status_t rotary_encoder_update_velocity(ROTARY_ENCODER_t *encoder, uint32_t now_ms)
